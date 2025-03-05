@@ -9,7 +9,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <Routes>
+        <Routes  basename="/gatepassReactUI">
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
