@@ -8,8 +8,8 @@ function App() {
 
   return (
     <>
-      <BrowserRouter>
-        <Routes  basename="/gatepassReactUI">
+      <BrowserRouter basename="/gatepassReactUI">
+        <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
