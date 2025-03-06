@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Api from '../../Api';
 import { useNavigate } from 'react-router-dom';
+import { alertService } from '../../AlertService';
 
 function Login() {
 
@@ -47,7 +48,15 @@ function Login() {
                     localStorage.setItem("email", res.data.responseContent.email);
                     localStorage.setItem("userName", res.data.responseContent.userName);
 
+                    alertService.showCustomPopup('success', 'Login Successful');
+
+
                     navigate('/dashboard');
+                } else {
+
+                    alertService.showCustomPopup('error', 'Access Denied');
+                    console.log("Access Denied");
+
                 }
             }).catch((err) => {
                 console.log(err);

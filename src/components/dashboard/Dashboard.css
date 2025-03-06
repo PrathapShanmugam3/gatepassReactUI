@@ -1,0 +1,16 @@
+/* dashboard.component.css */
+.custom-thead {
+    background-color: #007bff;
+    /* Bootstrap's primary color */
+    opacity: 0.75;
+    /* Adjust opacity as needed */
+    color: white;
+    /* Text color */
+}
+
+.custom-thead th {
+    background-color: inherit;
+    /* Ensure th inherits the background color */
+    color: inherit;
+    /* Ensure th inherits the text color */
+}
