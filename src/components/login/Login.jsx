@@ -1,11 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react';
 import Api from '../../Api';
 import { useNavigate } from 'react-router-dom';
 import { alertService } from '../../AlertService';
+import { useAuth } from '../../AuthContext';
 
 function Login() {
-
     const navigate = useNavigate();
+    const { login, isAuthenticated } = useAuth();
 
     const [usernameOrEmailOrPhone, setUsernameOrEmailOrPhone] = useState('');
     const [password, setPassword] = useState('');
@@ -13,10 +14,15 @@ function Login() {
     const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
 
 
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/dashboard');
+        }
+    }, [isAuthenticated, navigate]);
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validate inputs
         if (!usernameOrEmailOrPhone) {
             setUsernameErrorMessage('Username, email, or phone is required.');
             return;
@@ -39,29 +45,23 @@ function Login() {
         Api.post('/auth/login', reqData)
             .then((res) => {
                 console.log(res.data);
-                if (res.data.statusCode == 0 && res.data.responseContent.role == "GATEPASS_ADMIN") {
-                    console.log("called");
-                    localStorage.setItem("accessToken", res.data.responseContent.accessToken);
-                    localStorage.setItem("refreshToken", res.data.responseContent.refreshToken);
-                    localStorage.setItem("role", res.data.responseContent.role);
-                    localStorage.setItem("phone", res.data.responseContent.phone);
-                    localStorage.setItem("email", res.data.responseContent.email);
-                    localStorage.setItem("userName", res.data.responseContent.userName);
+                if (res.data.statusCode === 0 && res.data.responseContent.role === "GATEPASS_ADMIN") {
+                    const { accessToken, refreshToken, role, phone, email, userName } = res.data.responseContent;
+
+                    // Call the login function from AuthContext
+                    login(accessToken, refreshToken, role, phone, email, userName);
 
                     alertService.showCustomPopup('success', 'Login Successful');
-
-
                     navigate('/dashboard');
                 } else {
-
                     alertService.showCustomPopup('error', 'Access Denied');
                     console.log("Access Denied");
-
                 }
-            }).catch((err) => {
-                console.log(err);
             })
-
+            .catch((err) => {
+                console.log(err);
+                alertService.showCustomPopup('error', 'Login Failed. Please try again.');
+            });
 
         setUsernameErrorMessage('');
         setPasswordErrorMessage('');
@@ -72,7 +72,6 @@ function Login() {
         setUsernameErrorMessage('');
     };
 
-    // Handle password input change
     const handlePasswordChange = (e) => {
         setPassword(e.target.value);
         setPasswordErrorMessage('');
@@ -138,7 +137,6 @@ function Login() {
             </div>
         </div>
     );
-};
+}
 
-
-export default Login
+export default Login;
