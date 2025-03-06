@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route,HashRouter as Router} from "react-router-dom";
 import Login from './components/login/Login';
 import Dashboard from './components/dashboard/Dashboard';
 import NextPage from "./components/nextpage/NextPage";
@@ -7,7 +7,7 @@ import PrivateRoute from './PrivateRoute';
 
 const AppRouter = () => {
     return (
-        <BrowserRouter basename="/gatepassReactUI">
+        <Router basename="/gatepassReactUI">
             <AuthProvider>
                 <Routes>
                     <Route path="/" element={<Login />} />
@@ -17,7 +17,7 @@ const AppRouter = () => {
                     </Route>
                 </Routes>
             </AuthProvider>
-        </BrowserRouter>
+        </Router>
     );
 };
 
