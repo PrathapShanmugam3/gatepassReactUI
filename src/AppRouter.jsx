@@ -7,7 +7,7 @@ import PrivateRoute from './PrivateRoute';
 
 const AppRouter = () => {
     return (
-        <Router basename="/gatepassReactUI">
+        <Router>
             <AuthProvider>
                 <Routes>
                     <Route path="/" element={<Login />} />
