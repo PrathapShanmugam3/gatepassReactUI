@@ -1,45 +1,47 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { alertService } from './AlertService';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
-        const accessToken = localStorage.getItem("accessToken");
+        const accessToken = localStorage.getItem('accessToken');
         if (accessToken) {
             setIsAuthenticated(true);
+            const storedPath = localStorage.getItem('redirectPath') || '/dashboard';
+            navigate(storedPath);
+        } else {
+            setIsAuthenticated(false);
+            navigate('/');
         }
-    }, []);
+    }, [navigate]);
 
-    const login = (accessToken, refreshToken, role, phone, email, userName) => {
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
-        localStorage.setItem("role", role);
-        localStorage.setItem("phone", phone);
-        localStorage.setItem("email", email);
-        localStorage.setItem("userName", userName);
+    const login = (accessToken) => {
+        localStorage.setItem('accessToken', accessToken);
         setIsAuthenticated(true);
-        navigate('/dashboard'); // Redirect to dashboard after login
+        const storedPath = localStorage.getItem('redirectPath') || '/dashboard';
+        navigate(storedPath);
     };
 
     const logout = () => {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("role");
-        localStorage.removeItem("phone");
-        localStorage.removeItem("email");
-        localStorage.removeItem("userName");
-        setIsAuthenticated(false);
-        alertService.showCustomPopup('success', 'Logout Successful');
-        navigate('/');
+        const confirmLogout = window.confirm('Are you sure you want to logout?');
+        if (confirmLogout) {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('redirectPath');
+            setIsAuthenticated(false);
+            navigate('/');
+        }
+    };
+    const storePath = (path) => {
+        localStorage.setItem('redirectPath', path);
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, logout, login }}>
+        <AuthContext.Provider value={{ isAuthenticated, login, logout, storePath }}>
             {children}
         </AuthContext.Provider>
     );

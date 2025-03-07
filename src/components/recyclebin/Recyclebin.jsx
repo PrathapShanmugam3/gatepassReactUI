@@ -1,14 +1,11 @@
 
-
-
 import React, { useEffect, useState } from 'react'
 import Api from '../../Api';
 
-import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../AuthContext';
 
-function Dashboard() {
+const Recyclebin = () => {
 
     const [res, setRes] = useState({ data: [] });
     const [selectedCompanyIndex, setSelectedCompanyIndex] = useState(null);
@@ -18,7 +15,7 @@ function Dashboard() {
 
 
     const req = {
-        dataCode: "GETALL_COMPANY_DETAILS_WITH_LOG",
+        dataCode: "GETALL_DELETED_COMPANY_DETAILS",
         placeholderKeyValueMap: {}
     };
 
@@ -42,10 +39,6 @@ function Dashboard() {
         setSelectedCompanyIndex(index);
     };
 
-    const handleTrash=()=>{
-        navigate('/recyclebin');
-
-    }
 
     const handleViewClick = () => {
         if (selectedCompanyIndex !== null) {
@@ -59,21 +52,26 @@ function Dashboard() {
             navigate('/nextpage', { state: { company: selectedCompany } });
         }
     };
+
+    const handlebackButtonClick=()=>{
+        navigate('/dashboard');
+    }
     return (
         <>
 
             <div className="container-fluid">
-                <div className="row">
+                <div className="row ">
                     <div className="col">
-                        <button className="btn btn-danger opacity-75" onClick={logout}>Logout</button>
+                        <button className="btn btn-danger opacity-75 me-3" onClick={logout}>Logout</button>
+                        <button className="btn btn-primary opacity-75" onClick={handlebackButtonClick}>Back</button>
                     </div>
                     <div className="col text-center">
-                        <h2>Company Details</h2>
+                        <h2>Deleted Company Details</h2>
+                        <h4 className='text-danger'>After 30 days, this account will be automatically deleted</h4>
                     </div>
                     <div className="col">
                         <button className="btn btn-warning m-1" onClick={handleViewClick} disabled={selectedCompanyIndex === null}>VIEW</button>
-                        <button className="btn btn-success m-1" onClick={handleNextClick} disabled={selectedCompanyIndex === null}>NEXT</button>
-                        <button className="btn btn-success m-1" onClick={handleTrash}>TRASH</button>
+                        <button className="btn btn-success m-1" onClick={handleNextClick} disabled={selectedCompanyIndex === null}>Restore</button>
                     </div>
                 </div >
             </div >
@@ -137,4 +135,4 @@ function Dashboard() {
     )
 }
 
-export default Dashboard
+export default Recyclebin
