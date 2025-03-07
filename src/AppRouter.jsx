@@ -14,7 +14,7 @@ const AppRouter = () => {
                     <Route path="/" element={<Login />} />
                     <Route element={<PrivateRoute />}>
                         <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/nextpage" element={<NextPage />} />
+                        <Route path="/nextpage/:id" element={<NextPage />} />
                         <Route path="/recyclebin" element={<Recyclebin />} />
                     </Route>
                 </Routes>

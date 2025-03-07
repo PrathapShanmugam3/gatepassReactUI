@@ -42,7 +42,7 @@ function Dashboard() {
         setSelectedCompanyIndex(index);
     };
 
-    const handleTrash=()=>{
+    const handleTrash = () => {
         navigate('/recyclebin');
 
     }
@@ -52,11 +52,10 @@ function Dashboard() {
             console.log('View company:', res.data[selectedCompanyIndex]);
         }
     };
-
     const handleNextClick = () => {
         if (selectedCompanyIndex !== null) {
             const selectedCompany = res.data[selectedCompanyIndex];
-            navigate('/nextpage', { state: { company: selectedCompany } });
+            navigate(`/nextpage/${selectedCompany.id}`); // Pass the company ID in the URL
         }
     };
     return (
@@ -118,7 +117,7 @@ function Dashboard() {
                                 <td>{item.registration_number}</td>
                                 <td>{item.stage}</td>
                                 <td>
-                                    <input
+                                    <input className='form-check-input'
                                         type="radio"
                                         checked={selectedCompanyIndex === index}
                                         onChange={() => handleRadioChange(index)}

@@ -1,30 +1,91 @@
-import React, { useState,useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom'; // Use useParams to get the id
+import Api from '../../Api';
 
 const NextPage = () => {
-    const location = useLocation();
-    const { company } = location.state || {};
-  
-    useEffect(() => {
-        console.log('Company Data:', company);
-    }, []);
+    const { id } = useParams(); // Extract the id from the URL
+    const [company, setCompany] = useState(null); // State to store company details
+    const [loading, setLoading] = useState(true); // State to track loading status
+    const [error, setError] = useState(null); // State to track errors
+
     // State for editable fields
-    const [stage, setStage] = useState(company?.stage || '');
-    const [accountStatus, setAccountStatus] = useState(company?.account_status || false);
+    const [stage, setStage] = useState();
+    const [remarks, setRemarks] = useState(false);
+
+    const navigate = useNavigate();
+
+    // Fetch company details when the component mounts
+    useEffect(() => {
+        const fetchCompanyDetails = async () => {
+            try {
+                const req = {
+                    dataCode: "GETALL_COMPANY_DETAILS_WITH_LOG_BYCOMPANY_ID",
+                    placeholderKeyValueMap: {
+                        companyId: id,
+                    },
+                };
+
+                const response = await Api.post('/customdata/getdata', req);
+                if (response.data && response.data.statusCode === 0) {
+                    const companyData = response.data.responseContent[0];
+                    setCompany(companyData);
+                    setStage(companyData.stage || '');
+                } else {
+                    setError('Unexpected API response');
+                }
+            } catch (err) {
+                setError('Error fetching company details');
+                console.error('API error:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCompanyDetails();
+    }, [id]);
 
     const handleStageChange = (e) => {
         setStage(e.target.value);
     };
 
-    const handleAccountStatusChange = (e) => {
-        setAccountStatus(e.target.checked);
+    const handlebackButtonClick = () => {
+        navigate('/dashboard');
     };
+
+    const handleRemarks = (e) => {
+        setRemarks(e.target.value);
+    }
+
+    const handleSubmit = async () => {
+        try {
+            const req = {
+                id: id,
+                stage: stage,
+                remarks: remarks,
+
+            }
+
+            console.log(req);
+
+        } catch (err) {
+            setError('Error fetching company details');
+            console.error('API error:', err);
+        }
+    }
+
+    if (loading) {
+        return <span className="form-check-input"></span>;
+    }
+
+    if (error) {
+        return <p>{error}</p>;
+    }
 
     if (!company) {
         return <p>No company data available.</p>;
     }
 
-    return (
+    return (<>
         <div className="container mt-4">
             <h2>Company Details</h2>
             <div className="row">
@@ -94,6 +155,13 @@ const NextPage = () => {
                             readOnly
                         />
                     </div>
+                    {/* Save Button */}
+                    <div className='mt-5'>
+                        <button className="btn btn-success m-1 me-5" onClick={handleSubmit}>
+                            Save Changes
+                        </button>
+                        <button className="btn btn-danger opacity-75 m-1" onClick={handlebackButtonClick}>Back</button>
+                    </div>
                 </div>
 
                 {/* Right Side */}
@@ -154,37 +222,35 @@ const NextPage = () => {
                         <label htmlFor="stage" className="form-label">
                             <strong>Stage:</strong>
                         </label>
-                        <input
-                            type="text"
+                        <select
                             className="form-control"
                             id="stage"
                             value={stage}
                             onChange={handleStageChange}
-                        />
+                        >    <option value="">Select</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
                     </div>
 
                     <div className="mb-3 form-check">
-                        <input
-                            type="checkbox"
-                            className="form-check-input"
-                            id="accountStatus"
-                            checked={accountStatus}
-                            onChange={handleAccountStatusChange}
-                        />
-                        <label htmlFor="accountStatus" className="form-check-label">
-                            <strong>Account Status:</strong>
+                        <label htmlFor="remarks" className="form-label">
+                            <strong>Remarks:</strong>
                         </label>
+                        <input
+                            type="input"
+                            className="form-control"
+                            id="remarks"
+                            checked={remarks}
+                            onChange={handleRemarks}
+                        />
                     </div>
                 </div>
             </div>
 
-            {/* Save Button */}
-            <div className="mt-4">
-                <button className="btn btn-primary" onClick={() => alert('Save functionality here')}>
-                    Save Changes
-                </button>
-            </div>
+
         </div>
+    </>
     );
 };
 
